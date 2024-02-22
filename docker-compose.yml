@@ -1,0 +1,47 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:15
+    container_name: prisma-postgres
+    restart: always
+    networks:
+      - postgres-network
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - /root/postgres-data:/var/lib/postgresql/data
+      - ./backup:/backup
+    ports:
+      - "5432:5432"
+  # backup:
+  #   image: postgres:15
+  #   container_name: pg-backup
+  #   restart: always
+  #   networks:
+  #     - postgres-network
+  #   volumes:
+  #     - ./backup:/backup
+  #   command: >
+  #     sh -c 'pg_dump -U "${DATABASE_USER}" -d "${DATABASE_NAME}" > /backup/backup_$(date +%Y%m%d%H%M%S).sql'
+  # scheduler:
+  #   image: alpine
+  #   container_name: backup-scheduler
+  #   restart: always
+  #   networks:
+  #     - postgres-network
+  #   volumes:
+  #     - ./backup:/backup
+  #     - ./bin:/bin
+  #   command: >
+  #     sh -c 'echo "0 0 * * * /bin/backup.sh" > /var/spool/cron/crontabs/root'
+
+volumes:
+  postgres-data:
+
+
+networks:
+  postgres-network:
+    driver: bridge
